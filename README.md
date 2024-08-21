@@ -64,7 +64,7 @@
 
 ## Casos de Uso
 
-![CasoDeUso_Matricula.png](Arterfatos/CasoDeUso_Matricula.png)
+![CasoDeUso_Matricula.png](Artefatos/CasoDeUso_Matricula.png)
 
 ## Diagrama de Classes UML
 
