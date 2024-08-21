@@ -59,3 +59,13 @@
 - O sistema deve permitir o acesso ao portal de matrículas apenas durante os períodos de matrícula.
 - Fora dos períodos de matrícula, o sistema deve exibir uma mensagem informando que as inscrições estão fechadas.
 - O aluno deve poder ver as disciplinas oferecidas, o status da matrícula, e qualquer notificação relevante.
+
+# Artefatos
+
+## Casos de Uso
+
+![CasoDeUso_Matricula.png](Arterfatos/CasoDeUso_Matricula.png)
+
+## Diagrama de Classes UML
+
+![Diagrama de Classes UML.png](Artefatos/Diagrama de Classes UML.png)
