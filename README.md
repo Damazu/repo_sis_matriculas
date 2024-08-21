@@ -68,4 +68,4 @@
 
 ## Diagrama de Classes UML
 
-![Diagrama de Classes UML.png](Artefatos/Diagrama de Classes UML.png)
+![Diagrama de Classes UML.png](Artefatos/DiagramaClassesUML_Matriculas.png)
