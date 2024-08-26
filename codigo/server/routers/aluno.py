@@ -1,10 +1,15 @@
-from flask import Flask, request, jsonify
-from db import get_db_connection
+from flask import Blueprint, request, jsonify
+from data.database import get_db_connection
+import psycopg2
+from psycopg2.errors import UniqueViolation
 
-app = Flask(__name__)
+# Cria um Blueprint para a rota de Aluno
+aluno_bp = Blueprint('aluno', __name__)
 
-@app.route('/add_aluno', methods=['POST'])
+@aluno_bp.route('/add_aluno', methods=['POST'])
 def add_aluno():
+    conn = None
+    cursor = None
     try:
         # Recebe os dados do corpo da requisição
         data = request.json
@@ -30,17 +35,21 @@ def add_aluno():
         cursor.execute(insert_query, (nome, matricula, usuario_id))
 
         conn.commit()
-        cursor.close()
-        conn.close()
 
         return jsonify({'message': 'Aluno inserido com sucesso!'}), 201
 
-    except psycopg2.IntegrityError as e:
+    except UniqueViolation:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
         return jsonify({'error': 'Matrícula já existe.'}), 409
 
     except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
         return jsonify({'error': str(e)}), 500
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

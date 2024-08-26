@@ -1,0 +1,54 @@
+from flask import Blueprint, request, jsonify
+from data.database import get_db_connection
+import psycopg2
+from psycopg2.errors import UniqueViolation
+
+# Cria um Blueprint para a rota de Usuario
+usuario_bp = Blueprint('usuario', __name__)
+
+@usuario_bp.route('/add_usuario', methods=['POST'])
+def add_usuario():
+    conn = None
+    cursor = None
+    try:
+        # Recebe os dados do corpo da requisição
+        data = request.json
+
+        # Extrai os campos necessários
+        login = data.get('login')
+        senha = data.get('senha')
+
+        # Verifica se os dados estão presentes
+        if not login or not senha:
+            return jsonify({'error': 'Todos os campos são obrigatórios: login e senha'}), 400
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insere os dados na tabela Usuario
+        insert_query = """
+            INSERT INTO Usuario (login, senha)
+            VALUES (%s, %s)
+        """
+        cursor.execute(insert_query, (login, senha))
+
+        conn.commit()
+
+        return jsonify({'message': 'Usuário inserido com sucesso!'}), 201
+
+    except UniqueViolation:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': 'Login já existe.'}), 409
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
