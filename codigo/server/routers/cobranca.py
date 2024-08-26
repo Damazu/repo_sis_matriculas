@@ -1,0 +1,57 @@
+from flask import Blueprint, request, jsonify
+from data.database import get_db_connection
+import psycopg2
+from psycopg2.errors import ForeignKeyViolation
+
+# Cria um Blueprint para a rota de Cobranca
+cobranca_bp = Blueprint('cobranca', __name__)
+
+@cobranca_bp.route('/add_cobranca', methods=['POST'])
+def add_cobranca():
+    conn = None
+    cursor = None
+    try:
+        # Recebe os dados do corpo da requisição
+        data = request.json
+
+        # Extrai os campos necessários
+        tempo_divida = data.get('tempoDivida')
+        valor_cobranca = data.get('valorCobranca')
+        juros = data.get('juros')
+        pago = data.get('pago')
+        matricula_id = data.get('Matricula_idMatricula')
+
+        # Verifica se os dados estão presentes
+        if tempo_divida is None or valor_cobranca is None or juros is None or pago is None or matricula_id is None:
+            return jsonify({'error': 'Todos os campos são obrigatórios: tempoDivida, valorCobranca, juros, pago, Matricula_idMatricula'}), 400
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insere os dados na tabela Cobranca
+        insert_query = """
+            INSERT INTO Cobranca (tempoDivida, valorCobranca, juros, pago, Matricula_idMatricula)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, (tempo_divida, valor_cobranca, juros, pago, matricula_id))
+
+        conn.commit()
+
+        return jsonify({'message': 'Cobrança inserida com sucesso!'}), 201
+
+    except ForeignKeyViolation:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': 'Matrícula não encontrada.'}), 400
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
