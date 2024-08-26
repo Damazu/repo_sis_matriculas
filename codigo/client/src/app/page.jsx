@@ -1,6 +1,9 @@
 'use client'
 import React from "react"
 import { useEffect, useState } from "react"
+import { MantineProvider, Badge } from '@mantine/core';
+import LoginPage from "./LoginPage";
+import '@mantine/core/styles.css';
 
 
 function page() {
@@ -21,16 +24,13 @@ const [people, setPeople] = useState([])
   })
 
   return (
-    <>
-    <div>{message}</div>
-    <div>{people.map((person, index)=>(
-        <div key={index}>
-          {person}
-        </div>
-    ))
-      }</div>
-    </>
-  )
+    <MantineProvider>
+      <>
+    <LoginPage></LoginPage>
+      </>
+    </MantineProvider>
+  );
+
 }
 
 export default page
