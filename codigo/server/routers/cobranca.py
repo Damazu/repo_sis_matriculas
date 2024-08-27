@@ -55,3 +55,40 @@ def add_cobranca():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todas as cobranças
+@cobranca_bp.route('/get_cobrancas', methods=['GET'])
+def get_cobrancas():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todas as cobranças
+        cursor.execute("SELECT idCobranca, tempoDivida, valorCobranca, juros, pago, Matricula_idMatricula FROM Cobranca")
+        cobrancas = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for cobranca in cobrancas:
+            resultado.append({
+                'idCobranca': cobranca[0],
+                'tempoDivida': cobranca[1],
+                'valorCobranca': cobranca[2],
+                'juros': cobranca[3],
+                'pago': cobranca[4],
+                'Matricula_idMatricula': cobranca[5]
+            })
+
+        return jsonify({'cobrancas': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

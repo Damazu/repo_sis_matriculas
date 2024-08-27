@@ -57,3 +57,37 @@ def add_professor():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todos os professores
+@professor_bp.route('/get_professores', methods=['GET'])
+def get_professores():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todos os professores
+        cursor.execute("SELECT idProfessores, nome, Usuario_idUsuario FROM Professores")
+        professores = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for professor in professores:
+            resultado.append({
+                'idProfessores': professor[0],
+                'nome': professor[1],
+                'Usuario_idUsuario': professor[2]
+            })
+
+        return jsonify({'professores': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

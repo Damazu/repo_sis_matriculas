@@ -53,3 +53,38 @@ def add_disciplina():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todas as disciplinas
+@disciplina_bp.route('/get_disciplinas', methods=['GET'])
+def get_disciplinas():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todas as disciplinas
+        cursor.execute("SELECT idDisciplinas, nome, abertoMatricula, numCreditos FROM Disciplinas")
+        disciplinas = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for disciplina in disciplinas:
+            resultado.append({
+                'idDisciplinas': disciplina[0],
+                'nome': disciplina[1],
+                'abertoMatricula': disciplina[2],
+                'numCreditos': disciplina[3]
+            })
+
+        return jsonify({'disciplinas': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

@@ -52,3 +52,37 @@ def add_curso():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todos os cursos
+@curso_bp.route('/get_cursos', methods=['GET'])
+def get_cursos():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todos os cursos
+        cursor.execute("SELECT idCurso, nomeCurso, numCreditos FROM Curso")
+        cursos = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for curso in cursos:
+            resultado.append({
+                'idCurso': curso[0],
+                'nomeCurso': curso[1],
+                'numCreditos': curso[2]
+            })
+
+        return jsonify({'cursos': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

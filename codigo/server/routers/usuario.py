@@ -52,3 +52,36 @@ def add_usuario():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todos os usuários
+@usuario_bp.route('/get_usuarios', methods=['GET'])
+def get_usuarios():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todos os usuários
+        cursor.execute("SELECT idUsuario, login FROM Usuario")
+        usuarios = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for usuario in usuarios:
+            resultado.append({
+                'idUsuario': usuario[0],
+                'login': usuario[1]
+            })
+
+        return jsonify({'usuarios': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

@@ -53,3 +53,38 @@ def add_aluno():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todos os alunos
+@aluno_bp.route('/get_alunos', methods=['GET'])
+def get_alunos():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todos os alunos
+        cursor.execute("SELECT idAluno, nome, matricula, Usuario_idUsuario FROM Aluno")
+        alunos = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for aluno in alunos:
+            resultado.append({
+                'idAluno': aluno[0],
+                'nome': aluno[1],
+                'matricula': aluno[2],
+                'Usuario_idUsuario': aluno[3]
+            })
+
+        return jsonify({'alunos': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
