@@ -88,3 +88,89 @@ def get_disciplinas():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para deletar uma disciplina por ID
+@disciplina_bp.route('/delete_disciplina/<int:idDisciplinas>', methods=['DELETE'])
+def delete_disciplina(idDisciplinas):
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se a disciplina existe
+        cursor.execute("SELECT idDisciplinas FROM Disciplinas WHERE idDisciplinas = %s", (idDisciplinas,))
+        disciplina = cursor.fetchone()
+
+        if disciplina is None:
+            return jsonify({'error': 'Disciplina não encontrada.'}), 404
+
+        # Deleta a disciplina
+        delete_query = "DELETE FROM Disciplinas WHERE idDisciplinas = %s"
+        cursor.execute(delete_query, (idDisciplinas,))
+        conn.commit()
+
+        return jsonify({'message': 'Disciplina deletada com sucesso!'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# Rota para atualizar uma disciplina por ID
+@disciplina_bp.route('/update_disciplina/<int:idDisciplinas>', methods=['PUT'])
+def update_disciplina(idDisciplinas):
+    conn = None
+    cursor = None
+    try:
+        # Recebe os dados do corpo da requisição
+        data = request.json
+
+        # Extrai os campos necessários
+        nome = data.get('nome')
+        aberto_matricula = data.get('abertoMatricula')
+        num_creditos = data.get('numCreditos')
+
+        # Verifica se os dados estão presentes
+        if nome is None or aberto_matricula is None or num_creditos is None:
+            return jsonify({'error': 'Todos os campos são obrigatórios: nome, abertoMatricula e numCreditos'}), 400
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se a disciplina existe
+        cursor.execute("SELECT idDisciplinas FROM Disciplinas WHERE idDisciplinas = %s", (idDisciplinas,))
+        disciplina = cursor.fetchone()
+
+        if disciplina is None:
+            return jsonify({'error': 'Disciplina não encontrada.'}), 404
+
+        # Atualiza a disciplina
+        update_query = """
+            UPDATE Disciplinas
+            SET nome = %s, abertoMatricula = %s, numCreditos = %s
+            WHERE idDisciplinas = %s
+        """
+        cursor.execute(update_query, (nome, aberto_matricula, num_creditos, idDisciplinas))
+        conn.commit()
+
+        return jsonify({'message': 'Disciplina atualizada com sucesso!'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
