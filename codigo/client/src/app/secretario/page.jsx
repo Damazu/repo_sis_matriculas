@@ -1,26 +1,30 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Container, MantineProvider, Button, Group, Box, Modal, TextInput } from '@mantine/core';
+import axios from 'axios';
 
 const SecretárioCadastros = () => {
-  // Dados de exemplo para a tabela
-  const data = [
-    { nome: 'Matemática', creditos: 4 },
-    { nome: 'Física', creditos: 3 },
-    { nome: 'Química', creditos: 4 },
-    { nome: 'Biologia', creditos: 3 },
-    { nome: 'História', creditos: 2 },
-    { nome: 'Geografia', creditos: 3 },
-    { nome: 'Filosofia', creditos: 2 },
-    { nome: 'Sociologia', creditos: 2 },
-  ];
-
+  // Estado para armazenar os dados dos cursos
+  const [data, setData] = useState([]);
+  
   // Estado para controlar a página atual
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5; // Número de linhas por página
 
   // Estado para controlar o modal
   const [modalOpened, setModalOpened] = useState(false);
+
+  // Função para buscar dados da API usando axios
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/get_cursos')
+      .then((response) => {
+        console.log(response)
+        setData(response.data.cursos);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar cursos:', error);
+      });
+  }, []);
 
   // Cálculo de índices para a paginação
   const indexOfLastRow = currentPage * rowsPerPage;
@@ -31,8 +35,8 @@ const SecretárioCadastros = () => {
   const emptyRows = rowsPerPage - currentRows.length;
   const rows = currentRows.map((curso, index) => (
     <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f7f9fc' : '#fff' }}>
-      <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.nome}</td>
-      <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.creditos}</td>
+      <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.nomeCurso}</td>
+      <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.numCreditos}</td>
     </tr>
   ));
 
