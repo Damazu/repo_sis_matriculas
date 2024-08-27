@@ -52,3 +52,37 @@ def add_secretario():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para listar todos os secretários
+@secretario_bp.route('/get_secretarios', methods=['GET'])
+def get_secretarios():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todos os secretários
+        cursor.execute("SELECT idSecretario, nome, Usuario_idUsuario FROM Secretario")
+        secretarios = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for secretario in secretarios:
+            resultado.append({
+                'idSecretario': secretario[0],
+                'nome': secretario[1],
+                'Usuario_idUsuario': secretario[2]
+            })
+
+        return jsonify({'secretarios': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

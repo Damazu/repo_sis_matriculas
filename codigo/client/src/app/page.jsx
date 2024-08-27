@@ -5,23 +5,23 @@ import { MantineProvider, Badge } from '@mantine/core';
 import LoginPage from "./LoginPage";
 import '@mantine/core/styles.css';
 
+function Page() {
 
-function page() {
-
-const [message, setMessage] = useState("Loading")
-const [people, setPeople] = useState([])
-
+  const [message, setMessage] = useState("Loading...")
+  const [alunos, setAlunos] = useState([])
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/home").then(
-      (response) => response.json()
-    ).then((data) =>{
-      setMessage(data.message)
-      setPeople(data.people)
-    }
-
-    )
-  })
+    fetch("http://localhost:8080/api/home")
+      .then((response) => response.json())
+      .then((data) => {
+        // Supondo que o endpoint /api/home retorne os alunos no campo 'alunos'
+        setAlunos(data.alunos || [])
+        setMessage("Alunos carregados:")
+      })
+      .catch(() => {
+        setMessage("Erro ao carregar os alunos")
+      })
+  }, []) // O array vazio garante que o useEffect será executado apenas uma vez
 
   return (
     <MantineProvider>
@@ -32,5 +32,6 @@ const [people, setPeople] = useState([])
   );
 
 }
-
-export default page
+k
+/*  */
+export default Page

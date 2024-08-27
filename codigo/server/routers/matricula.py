@@ -54,3 +54,38 @@ def add_matricula():
             cursor.close()
         if conn:
             conn.close()
+# Rota para listar todas as matrículas
+@matricula_bp.route('/get_matriculas', methods=['GET'])
+def get_matriculas():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter todas as matrículas
+        cursor.execute("SELECT idMatricula, data, status, Disciplinas_idDisciplinas, Aluno_idAluno FROM Matricula")
+        matriculas = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for matricula in matriculas:
+            resultado.append({
+                'idMatricula': matricula[0],
+                'data': matricula[1],
+                'status': matricula[2],
+                'Disciplinas_idDisciplinas': matricula[3],
+                'Aluno_idAluno': matricula[4]
+            })
+
+        return jsonify({'matriculas': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
