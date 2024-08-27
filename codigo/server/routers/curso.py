@@ -86,3 +86,38 @@ def get_cursos():
             cursor.close()
         if conn:
             conn.close()
+
+# Rota para deletar um curso por ID
+@curso_bp.route('/delete_curso/<int:idCurso>', methods=['DELETE'])
+def delete_curso(idCurso):
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se o curso existe
+        cursor.execute("SELECT idCurso FROM Curso WHERE idCurso = %s", (idCurso,))
+        curso = cursor.fetchone()
+
+        if curso is None:
+            return jsonify({'error': 'Curso não encontrado.'}), 404
+
+        # Deleta o curso
+        delete_query = "DELETE FROM Curso WHERE idCurso = %s"
+        cursor.execute(delete_query, (idCurso,))
+        conn.commit()
+
+        return jsonify({'message': 'Curso deletado com sucesso!'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
