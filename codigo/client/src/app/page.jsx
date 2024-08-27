@@ -1,36 +1,19 @@
-'use client'
-import React from "react"
-import { useEffect, useState } from "react"
-import { MantineProvider, Badge } from '@mantine/core';
-import LoginPage from "./LoginPage";
+'use client';
+import React from "react";
+import { MantineProvider } from '@mantine/core';
+import Layout from "../components/applayout/layout";
 import '@mantine/core/styles.css';
 
-
 function page() {
-
-const [message, setMessage] = useState("Loading")
-const [people, setPeople] = useState([])
-
-
-  useEffect(() => {
-    fetch("http://localhost:8080/api/home").then(
-      (response) => response.json()
-    ).then((data) =>{
-      setMessage(data.message)
-      setPeople(data.people)
-    }
-
-    )
-  })
-
   return (
     <MantineProvider>
-      <>
-    <LoginPage></LoginPage>
-      </>
+        <div>
+          {/* Conteúdo da sua página */}
+          <h1>Bem-vindo ao SisMatricula!</h1>
+          {/* Outros componentes ou conteúdo específico da página */}
+        </div>
     </MantineProvider>
   );
-
 }
 
-export default page
+export default page;
