@@ -1,0 +1,68 @@
+.header {
+  height: 80px;
+  background-color: #003399; /* Azul escuro */
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.inner {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.link {
+  display: block;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: var(--mantine-radius-lg);
+  background-color: #ccd9f9; /* Tom mais claro de azul */
+  text-decoration: none;
+  color: #003399; /* Azul escuro */
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+}
+
+.link:hover {
+  background-color: #b3c7f7; /* Cor de fundo mais escura ao passar o mouse */
+}
+
+[data-mantine-color-scheme] .link[data-active] {
+  background-color: #8ca6f7; /* Cor para link ativo */
+  color: #003399; /* Azul escuro */
+}
+
+.userDetails {
+  display: flex;
+  align-items: center;
+}
+
+.usertextDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.userImage {
+  width: 45px;
+  height: 45px;
+  margin: 5px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.logoutLink {
+  margin-bottom: 16px;
+  color: white;
+  text-decoration: none;
+}
+
+.logoutLink:hover {
+  text-decoration: underline;
+}
