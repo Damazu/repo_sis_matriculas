@@ -7,8 +7,9 @@ import Link from 'next/link';
 
 const mockdata = [
   { label: 'Home', link: '/' },
+  { label: 'Aluno', link: '/aluno ' },
   { label: 'Secretario', link: '/secretario' },
-  { label: 'Login', link: '/LoginPage' }
+  { label: 'Login', link: '/login ' }
 ];
 
 export default function Navbar({ opened }) {

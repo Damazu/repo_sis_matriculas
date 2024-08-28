@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, Button, Group } from '@mantine/core';
-import './globals.css'; // Importando o CSS externo
+import '../globals.css'; // Importando o CSS externo
 
 const LoginPage = () => {
   return (

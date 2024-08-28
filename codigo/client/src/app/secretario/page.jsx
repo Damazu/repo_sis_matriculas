@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CadastroCursos from './cursos/page';
 import CadastroDisciplinas from './disciplinas/page';
 
