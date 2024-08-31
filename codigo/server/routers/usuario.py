@@ -26,25 +26,28 @@ def add_usuario():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Insere os dados na tabela Usuario
+        # Insere os dados na tabela Usuario e recupera o ID gerado
         insert_query = """
             INSERT INTO Usuario (login, senha)
             VALUES (%s, %s)
+            RETURNING idUsuario; 
         """
         cursor.execute(insert_query, (login, senha))
+        usuario_id = cursor.fetchone()[0] 
 
         conn.commit()
 
-        return jsonify({'message': 'Usuário inserido com sucesso!'}), 201
+        # Retorna o ID do usuário criado junto com a mensagem de sucesso
+        return jsonify({'message': 'Usuário inserido com sucesso!', 'idUsuario': usuario_id}), 201
 
     except UniqueViolation:
         if conn:
-            conn.rollback()  # Desfaz transações pendentes
+            conn.rollback() 
         return jsonify({'error': 'Login já existe.'}), 409
 
     except Exception as e:
         if conn:
-            conn.rollback()  # Desfaz transações pendentes
+            conn.rollback() 
         return jsonify({'error': str(e)}), 500
 
     finally:
