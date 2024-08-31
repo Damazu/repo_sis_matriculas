@@ -68,4 +68,8 @@
 
 ## Diagrama de Classes UML
 
-![Diagrama de Classes UML.png](Artefatos/DiagramaClassesUML_Matriculas.png)
+![Diagrama de Classes UML.png](Artefatos/DiagramaClassesUML.png)
+
+## Diagrama de Entidades de Relacionamento
+
+![DER.jpeg](Artefatos/DERMatriculas.jpeg)

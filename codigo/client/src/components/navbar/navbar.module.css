@@ -1,0 +1,36 @@
+.navbar {
+    background-color: #ffffff; /* Fundo branco para a navbar */
+    height: 100%; /* Ocupa toda a altura disponível */
+    width: 100%; /* Ocupa toda a largura */
+    bottom: 0; /* Estende a navbar até o final da tela */
+    color: #003399; /* Azul escuro para o texto */
+  }
+  
+  .links {
+    padding: 10px;
+  }
+  
+  .linksInner {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .navLink {
+    padding: 8px 12px;
+    border-radius: var(--mantine-radius-lg);
+    background-color: #ffffff; /* Fundo branco */
+    text-decoration: none;
+    color: #003399; /* Azul escuro para o texto dos links */
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 500;
+  }
+  
+  .navLink:hover {
+    background-color: #e0e7ff; /* Leve azul claro ao passar o mouse */
+  }
+  
+  .navLink[data-active="true"] {
+    background-color: #c7d2fe; /* Azul claro para link ativo */
+    color: #003399; /* Azul escuro para o texto do link ativo */
+  }
+  

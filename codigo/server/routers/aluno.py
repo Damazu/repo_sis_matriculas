@@ -88,3 +88,40 @@ def get_alunos():
             cursor.close()
         if conn:
             conn.close()
+
+@aluno_bp.route('/get_usuarios_disponiveis', methods=['GET'])
+def get_usuarios_disponiveis():
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Consulta para buscar usuários que não estão associados a nenhum aluno
+        query = """
+        SELECT idUsuario, login 
+        FROM Usuario 
+        WHERE idUsuario NOT IN (SELECT Usuario_idUsuario FROM Aluno)
+        """
+        cursor.execute(query)
+        usuarios = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for usuario in usuarios:
+            resultado.append({
+                'idUsuario': usuario[0],
+                'login': usuario[1]
+            })
+
+        return jsonify({'usuarios': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
