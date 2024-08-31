@@ -151,3 +151,83 @@ def update_curso(idCurso):
             cursor.close()
         if conn:
             conn.close()
+
+@curso_bp.route('/get_disciplinas_by_curso/<int:idCurso>', methods=['GET'])
+def get_disciplinas_by_curso(idCurso):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT d.idDisciplinas, d.nome, d.abertoMatricula, d.numCreditos
+            FROM curso_has_disciplinas chd
+            JOIN Disciplinas d ON chd.disciplinas_iddisciplinas = d.idDisciplinas
+            WHERE chd.curso_idcurso = %s
+        """
+        cursor.execute(query, (idCurso,))
+        disciplinas = cursor.fetchall()
+
+        resultado = [
+            {
+                'idDisciplinas': disciplina[0],
+                'nome': disciplina[1],
+                'abertoMatricula': disciplina[2],
+                'numCreditos': disciplina[3]
+            }
+            for disciplina in disciplinas
+        ]
+
+        return jsonify({'disciplinas': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# Rota para associar uma disciplina a um curso
+@curso_bp.route('/add_disciplina_to_curso', methods=['POST'])
+def add_disciplina_to_curso():
+    conn = None
+    cursor = None
+    try:
+        data = request.json
+        id_curso = data.get('curso_idcurso')
+        id_disciplina = data.get('disciplinas_iddisciplinas')
+
+        if not id_curso or not id_disciplina:
+            return jsonify({'error': 'Todos os campos são obrigatórios: curso_idcurso e disciplinas_iddisciplinas'}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        insert_query = """
+            INSERT INTO curso_has_disciplinas (curso_idcurso, disciplinas_iddisciplinas)
+            VALUES (%s, %s)
+        """
+        cursor.execute(insert_query, (id_curso, id_disciplina))
+
+        conn.commit()
+
+        return jsonify({'message': 'Disciplina associada ao curso com sucesso!'}), 201
+
+    except UniqueViolation:
+        if conn:
+            conn.rollback()
+        return jsonify({'error': 'Essa associação entre curso e disciplina já existe.'}), 409
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

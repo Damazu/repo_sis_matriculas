@@ -101,10 +101,10 @@ const CadastroDisciplinas = () => {
   const rows = currentRows.map((disciplina, index) => (
     disciplina && (
       <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f7f9fc' : '#fff' }}>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{disciplina.nome}</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{disciplina.abertoMatricula ? 'Sim' : 'Não'}</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{disciplina.numCreditos}</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>{disciplina.nome}</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>{disciplina.abertoMatricula ? 'Sim' : 'Não'}</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>{disciplina.numCreditos}</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>
           <Button onClick={() => openEditModal(disciplina)} color="blue" size="xs" style={{ marginRight: '5px' }}>
             Editar
           </Button>
@@ -131,15 +131,19 @@ const CadastroDisciplinas = () => {
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
   return (
-    <Container style={{ marginTop: '30px', maxWidth: '800px' }}>
+    <Container style={{ marginTop: '30px', maxWidth: '800px', backgroundColor: '#f0f4f8', padding: '20px', borderRadius: '8px' }}>
       <Box sx={{ padding: '20px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
+        
+        {/* Título estilizado */}
+        <h1 style={{ textAlign: 'center', color: '#003399', marginBottom: '20px' }}>Cadastro de Disciplinas</h1>
+
         <Table striped highlightOnHover withBorder withColumnBorders>
           <thead style={{ backgroundColor: '#003399', color: '#fff' }}>
             <tr>
-              <th style={{ padding: '12px' }}>Nome</th>
-              <th style={{ padding: '12px' }}>Aberto para Matrícula</th>
-              <th style={{ padding: '12px' }}>Créditos</th>
-              <th style={{ padding: '12px' }}>Ações</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Nome</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Aberto para Matrícula</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Créditos</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
@@ -169,7 +173,7 @@ const CadastroDisciplinas = () => {
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        title="Nova Disciplina"
+        title={<h2 style={{ textAlign: 'center', color: '#003399' }}>Nova Disciplina</h2>}
         centered
       >
         <TextInput
@@ -178,21 +182,24 @@ const CadastroDisciplinas = () => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <Switch
           label="Aberto para Matrícula"
           checked={abertoMatricula}
           onChange={(e) => setAbertoMatricula(e.currentTarget.checked)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <TextInput
           label="Créditos"
           placeholder="Digite o número de créditos"
           value={numCreditos}
           onChange={(e) => setNumCreditos(e.target.value)}
+          style={{ marginBottom: '10px' }}
         />
         <Group position="right" mt="md">
-          <Button onClick={handleAddDisciplina}>Salvar</Button>
+          <Button onClick={handleAddDisciplina} color="blue">Salvar</Button>
         </Group>
       </Modal>
 
@@ -200,7 +207,7 @@ const CadastroDisciplinas = () => {
       <Modal
         opened={editModalOpened}
         onClose={() => setEditModalOpened(false)}
-        title="Editar Disciplina"
+        title={<h2 style={{ textAlign: 'center', color: '#003399' }}>Editar Disciplina</h2>}
         centered
       >
         <TextInput
@@ -209,21 +216,24 @@ const CadastroDisciplinas = () => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <Switch
           label="Aberto para Matrícula"
           checked={abertoMatricula}
           onChange={(e) => setAbertoMatricula(e.currentTarget.checked)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <TextInput
           label="Créditos"
           placeholder="Digite o número de créditos"
           value={numCreditos}
           onChange={(e) => setNumCreditos(e.target.value)}
+          style={{ marginBottom: '10px' }}
         />
         <Group position="right" mt="md">
-          <Button onClick={handleEditDisciplina}>Salvar</Button>
+          <Button onClick={handleEditDisciplina} color="blue">Salvar</Button>
         </Group>
       </Modal>
     </Container>
