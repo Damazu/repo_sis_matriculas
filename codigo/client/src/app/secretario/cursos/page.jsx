@@ -95,9 +95,9 @@ const CadastroCursos = () => {
   const rows = currentRows.map((curso, index) => (
     curso && (
       <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f7f9fc' : '#fff' }}>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.nomeCurso}</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{curso.numCreditos}</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>{curso.nomeCurso}</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>{curso.numCreditos}</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>
           <Button onClick={() => openEditModal(curso)} color="blue" size="xs" style={{ marginRight: '5px' }}>
             Editar
           </Button>
@@ -112,9 +112,9 @@ const CadastroCursos = () => {
   for (let i = 0; i < emptyRows; i++) {
     rows.push(
       <tr key={`empty-${i}`} style={{ backgroundColor: '#fff' }}>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>&nbsp;</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>&nbsp;</td>
-        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>&nbsp;</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>&nbsp;</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>&nbsp;</td>
+        <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>&nbsp;</td>
       </tr>
     );
   }
@@ -123,14 +123,18 @@ const CadastroCursos = () => {
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
   return (
-    <Container style={{ marginTop: '30px', maxWidth: '800px' }}>
+    <Container style={{ marginTop: '30px', maxWidth: '800px', backgroundColor: '#f0f4f8', padding: '20px', borderRadius: '8px' }}>
       <Box sx={{ padding: '20px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
+        
+        {/* Título estilizado */}
+        <h1 style={{ textAlign: 'center', color: '#003399', marginBottom: '20px' }}>Cadastro de Cursos</h1>
+
         <Table striped highlightOnHover withBorder withColumnBorders>
           <thead style={{ backgroundColor: '#003399', color: '#fff' }}>
             <tr>
-              <th style={{ padding: '12px' }}>Nome</th>
-              <th style={{ padding: '12px' }}>Créditos</th>
-              <th style={{ padding: '12px' }}>Ações</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Nome</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Créditos</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
@@ -160,7 +164,7 @@ const CadastroCursos = () => {
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        title="Novo Cadastro"
+        title={<h2 style={{ textAlign: 'center', color: '#003399' }}>Novo Cadastro</h2>}
         centered
       >
         <TextInput
@@ -169,15 +173,17 @@ const CadastroCursos = () => {
           value={nomeCurso}
           onChange={(e) => setNomeCurso(e.target.value)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <TextInput
           label="Créditos"
           placeholder="Digite o número de créditos"
           value={numCreditos}
           onChange={(e) => setNumCreditos(e.target.value)}
+          style={{ marginBottom: '10px' }}
         />
         <Group position="right" mt="md">
-          <Button onClick={handleAddCurso}>Salvar</Button>
+          <Button onClick={handleAddCurso} color="blue">Salvar</Button>
         </Group>
       </Modal>
 
@@ -185,7 +191,7 @@ const CadastroCursos = () => {
       <Modal
         opened={editModalOpened}
         onClose={() => setEditModalOpened(false)}
-        title="Editar Cadastro"
+        title={<h2 style={{ textAlign: 'center', color: '#003399' }}>Editar Cadastro</h2>}
         centered
       >
         <TextInput
@@ -194,15 +200,17 @@ const CadastroCursos = () => {
           value={nomeCurso}
           onChange={(e) => setNomeCurso(e.target.value)}
           mb="sm"
+          style={{ marginBottom: '10px' }}
         />
         <TextInput
           label="Créditos"
           placeholder="Digite o número de créditos"
           value={numCreditos}
           onChange={(e) => setNumCreditos(e.target.value)}
+          style={{ marginBottom: '10px' }}
         />
         <Group position="right" mt="md">
-          <Button onClick={handleEditCurso}>Salvar</Button>
+          <Button onClick={handleEditCurso} color="blue">Salvar</Button>
         </Group>
       </Modal>
     </Container>
