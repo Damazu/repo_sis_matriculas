@@ -125,3 +125,57 @@ def get_usuarios_disponiveis():
             cursor.close()
         if conn:
             conn.close()
+
+@aluno_bp.route('/get_aluno/<int:idAluno>', methods=['GET'])
+def get_aluno(idAluno):
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter o aluno específico pelo ID
+        cursor.execute("SELECT idAluno, nome, matricula, Usuario_idUsuario FROM Aluno WHERE idAluno = %s", (idAluno,))
+        aluno = cursor.fetchone()
+
+        if aluno:
+            # Formata os dados em um dicionário
+            resultado = {
+                'idAluno': aluno[0],
+                'nome': aluno[1],
+                'matricula': aluno[2],
+                'Usuario_idUsuario': aluno[3]
+            }
+            return jsonify({'aluno': resultado}), 200
+        else:
+            return jsonify({'error': 'Aluno não encontrado'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@aluno_bp.route('/delete_aluno/<int:idAluno>', methods=['DELETE'])
+def delete_aluno(idAluno):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Aluno WHERE idAluno = %s", (idAluno,))
+        conn.commit()
+        return jsonify({'message': 'Aluno deletado com sucesso'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
