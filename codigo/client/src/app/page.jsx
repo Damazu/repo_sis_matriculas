@@ -3,19 +3,22 @@ import React from "react";
 import { MantineProvider } from '@mantine/core';
 import Layout from "../components/applayout/layout";
 import '@mantine/core/styles.css';
+import "./globals.css";
 
 function page() {
   return (
     <MantineProvider>
+      <Layout>
         <div>
           {/* Conteúdo da sua página */}
           <h1>Bem-vindo ao SisMatricula!</h1>
           {/* Outros componentes ou conteúdo específico da página */}
         </div>
+      </Layout>
     </MantineProvider>
   );
 }
-k
+
 /*  <>
       <div>{message}</div>
       <div>
@@ -34,4 +37,4 @@ k
         )}
       </div>
     </>*/
-export default Page
+export default page
