@@ -9,7 +9,8 @@ const mockdata = [
   { label: 'Home', link: '/' },
   { label: 'Aluno', link: '/aluno ' },
   { label: 'Secretario', link: '/secretario' },
-  { label: 'Login', link: '/login ' }
+  { label: 'Login', link: '/login ' },
+  { label: 'Perfil do aluno ', link: '/PerfilAluno ' }
 ];
 
 export default function Navbar({ opened }) {
