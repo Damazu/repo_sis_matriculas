@@ -44,6 +44,7 @@ const CadastroDisciplinas = () => {
         setAbertoMatricula(false);
         setNumCreditos('');
         setModalOpened(false);
+        getInfoDisciplinasBD()
       })
       .catch((error) => {
         console.error('Erro ao adicionar disciplina:', error);
@@ -68,6 +69,7 @@ const CadastroDisciplinas = () => {
         setAbertoMatricula(false);
         setNumCreditos('');
         setEditModalOpened(false);
+        getInfoDisciplinasBD()
       })
       .catch((error) => {
         console.error('Erro ao editar disciplina:', error);
@@ -91,6 +93,7 @@ const CadastroDisciplinas = () => {
     setAbertoMatricula(disciplina.abertoMatricula);
     setNumCreditos(disciplina.numCreditos);
     setEditModalOpened(true);
+    getInfoDisciplinasBD();
   };
 
   const indexOfLastRow = currentPage * rowsPerPage;
