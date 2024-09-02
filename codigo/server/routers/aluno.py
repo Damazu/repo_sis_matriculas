@@ -167,11 +167,19 @@ def delete_aluno(idAluno):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Primeiro, remover as associações do aluno com as disciplinas
+        cursor.execute("DELETE FROM Aluno_has_Disciplinas WHERE Aluno_idAluno = %s", (idAluno,))
+
+        # Depois, remover o aluno da tabela Aluno
         cursor.execute("DELETE FROM Aluno WHERE idAluno = %s", (idAluno,))
+        
         conn.commit()
         return jsonify({'message': 'Aluno deletado com sucesso'}), 200
 
     except Exception as e:
+        if conn:
+            conn.rollback()
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -249,6 +257,40 @@ def get_disciplinas_aluno(idAluno):
         return jsonify({'disciplinas': resultado}), 200
 
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@aluno_bp.route('/delete_disciplina_aluno', methods=['DELETE'])
+def delete_disciplina_aluno():
+    conn = None
+    cursor = None
+    try:
+        data = request.json
+        id_aluno = data.get('idAluno')
+        id_disciplinas = data.get('idDisciplinas')
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Deleta a disciplina do aluno na tabela Aluno_has_Disciplinas
+        delete_query = """
+            DELETE FROM Aluno_has_Disciplinas
+            WHERE Aluno_idAluno = %s AND Disciplinas_idDisciplinas = %s
+        """
+        cursor.execute(delete_query, (id_aluno, id_disciplinas))
+        conn.commit()
+
+        return jsonify({'message': 'Disciplina desvinculada com sucesso!'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
         return jsonify({'error': str(e)}), 500
 
     finally:
