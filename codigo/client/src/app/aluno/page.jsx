@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Group, Box, TextInput, Notification, Radio } from '@mantine/core'; // Removemos o Select
+import { Container, Button, Group, Box, TextInput, Notification, Radio } from '@mantine/core';
 import axios from 'axios';
 
 const Cadastro = () => {
@@ -11,29 +11,42 @@ const Cadastro = () => {
   const [senha, setSenha] = useState(''); // Novo estado para senha
   const [notification, setNotification] = useState({ message: '', color: '' });
 
+  // Função para gerar matrícula aleatória de 8 dígitos
+  const gerarMatriculaAleatoria = () => {
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+  };
+
+  useEffect(() => {
+    if (tipoUsuario === 'aluno') {
+      setMatricula(gerarMatriculaAleatoria()); // Gera uma matrícula ao selecionar 'Aluno'
+    } else {
+      setMatricula(''); // Limpa a matrícula se for professor
+    }
+  }, [tipoUsuario]);
+
   const handleCadastro = async () => {
     try {
-       // 1. Cadastrar o usuário geral
-       const novoUsuarioResponse = await axios.post('http://localhost:8080/api/add_usuario', { login, senha });
-       const usuarioId = novoUsuarioResponse.data.idUsuario; 
+      // 1. Cadastrar o usuário geral
+      const novoUsuarioResponse = await axios.post('http://localhost:8080/api/add_usuario', { login, senha });
+      const usuarioId = novoUsuarioResponse.data.idUsuario; 
    
-       let dadosCadastro = {
-         nome,
-         Usuario_idUsuario: usuarioId  // Use o usuarioId diretamente aqui
-       };
+      let dadosCadastro = {
+        nome,
+        Usuario_idUsuario: usuarioId  // Use o usuarioId diretamente aqui
+      };
    
-       if (tipoUsuario === 'aluno') {
-         dadosCadastro.matricula = matricula;
-         await axios.post('http://localhost:8080/api/add_aluno', dadosCadastro);
-         setNotification({ message: 'Aluno cadastrado com sucesso!', color: 'green' });
-       } else if (tipoUsuario === 'professor') {
-         await axios.post('http://localhost:8080/api/add_professor', dadosCadastro);
-         setNotification({ message: 'Professor cadastrado com sucesso!', color: 'green' });
-       }
+      if (tipoUsuario === 'aluno') {
+        dadosCadastro.matricula = matricula;
+        await axios.post('http://localhost:8080/api/add_aluno', dadosCadastro);
+        setNotification({ message: 'Aluno cadastrado com sucesso!', color: 'green' });
+      } else if (tipoUsuario === 'professor') {
+        await axios.post('http://localhost:8080/api/add_professor', dadosCadastro);
+        setNotification({ message: 'Professor cadastrado com sucesso!', color: 'green' });
+      }
 
       // Limpar os campos após o cadastro bem-sucedido
       setNome('');
-      setMatricula('');
+      setMatricula(tipoUsuario === 'aluno' ? gerarMatriculaAleatoria() : ''); // Gera uma nova matrícula para o próximo cadastro de aluno
       setLogin('');
       setSenha('');
 
@@ -78,15 +91,7 @@ const Cadastro = () => {
           mb="sm"
         />
 
-        {tipoUsuario === 'aluno' && (
-          <TextInput
-            label="Matrícula"
-            placeholder="Digite a matrícula"
-            value={matricula}
-            onChange={(e) => setMatricula(e.target.value)}
-            mb="sm"
-          />
-        )}
+        
 
         <TextInput 
           label="Senha"
