@@ -175,4 +175,7 @@ def update_disciplina(idDisciplinas):
         if conn:
             conn.close()
 
+<<<<<<< HEAD
             
+=======
+>>>>>>> merge-interface-back

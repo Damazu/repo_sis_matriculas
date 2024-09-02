@@ -167,11 +167,130 @@ def delete_aluno(idAluno):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Primeiro, remover as associações do aluno com as disciplinas
+        cursor.execute("DELETE FROM Aluno_has_Disciplinas WHERE Aluno_idAluno = %s", (idAluno,))
+
+        # Depois, remover o aluno da tabela Aluno
         cursor.execute("DELETE FROM Aluno WHERE idAluno = %s", (idAluno,))
+        
         conn.commit()
         return jsonify({'message': 'Aluno deletado com sucesso'}), 200
 
     except Exception as e:
+        if conn:
+            conn.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@aluno_bp.route('/matricular_aluno', methods=['POST'])
+def matricular_aluno():
+    conn = None
+    cursor = None
+    try:
+        # Recebe os dados do corpo da requisição
+        data = request.json
+        id_aluno = data.get('idAluno')
+        disciplinas = data.get('disciplinas')
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insere as disciplinas para o aluno na tabela Aluno_has_Disciplinas
+        insert_query = """
+            INSERT INTO Aluno_has_Disciplinas (Aluno_idAluno, Disciplinas_idDisciplinas)
+            VALUES (%s, %s)
+        """
+        for disciplina_id in disciplinas:
+            cursor.execute(insert_query, (id_aluno, disciplina_id))
+
+        conn.commit()
+
+        return jsonify({'message': 'Aluno matriculado com sucesso!'}), 201
+
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Desfaz transações pendentes
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@aluno_bp.route('/get_disciplinas_aluno/<int:idAluno>', methods=['GET'])
+def get_disciplinas_aluno(idAluno):
+    conn = None
+    cursor = None
+    try:
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Executa a consulta SQL para obter as disciplinas do aluno específico
+        query = """
+        SELECT d.idDisciplinas, d.nome, d.abertoMatricula, d.numCreditos
+        FROM Disciplinas d
+        JOIN Aluno_has_Disciplinas ahd ON d.idDisciplinas = ahd.Disciplinas_idDisciplinas
+        WHERE ahd.Aluno_idAluno = %s
+        """
+        cursor.execute(query, (idAluno,))
+        disciplinas = cursor.fetchall()
+
+        # Formata os dados em uma lista de dicionários
+        resultado = []
+        for disciplina in disciplinas:
+            resultado.append({
+                'idDisciplinas': disciplina[0],
+                'nome': disciplina[1],
+                'abertoMatricula': disciplina[2],
+                'numCreditos': disciplina[3]
+            })
+
+        return jsonify({'disciplinas': resultado}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@aluno_bp.route('/delete_disciplina_aluno', methods=['DELETE'])
+def delete_disciplina_aluno():
+    conn = None
+    cursor = None
+    try:
+        data = request.json
+        id_aluno = data.get('idAluno')
+        id_disciplinas = data.get('idDisciplinas')
+
+        # Conecte ao banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Deleta a disciplina do aluno na tabela Aluno_has_Disciplinas
+        delete_query = """
+            DELETE FROM Aluno_has_Disciplinas
+            WHERE Aluno_idAluno = %s AND Disciplinas_idDisciplinas = %s
+        """
+        cursor.execute(delete_query, (id_aluno, id_disciplinas))
+        conn.commit()
+
+        return jsonify({'message': 'Disciplina desvinculada com sucesso!'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
         return jsonify({'error': str(e)}), 500
 
     finally:
