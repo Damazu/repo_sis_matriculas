@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Loader, Table, Box, Notification, Title, Select, Button, Group } from '@mantine/core';
 import axios from 'axios';
+import "./PerfilAluno.css"
 
 const PerfilAluno = () => {
   const [alunos, setAlunos] = useState([]);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+  const [disciplinas, setDisciplinas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ message: '', color: '' });
 
@@ -13,7 +15,6 @@ const PerfilAluno = () => {
     // Busca os dados dos alunos
     axios.get('http://localhost:8080/api/get_alunos')
       .then((response) => {
-        console.log(response.data.alunos); // Adicione este log para verificar os dados retornados
         setAlunos(response.data.alunos);
         setLoading(false);
       })
@@ -23,26 +24,42 @@ const PerfilAluno = () => {
         setLoading(false);
       });
   }, []);
-  
+
+  useEffect(() => {
+    if (alunoSelecionado) {
+      // Busca as disciplinas do aluno selecionado
+      axios.get(`http://localhost:8080/api/get_disciplinas_aluno/${alunoSelecionado.idAluno}`)
+        .then((response) => {
+          setDisciplinas(response.data.disciplinas);
+        })
+        .catch((error) => {
+          console.error('Erro ao buscar disciplinas do aluno:', error);
+          setNotification({ message: 'Erro ao carregar disciplinas do aluno.', color: 'red' });
+        });
+    }
+  }, [alunoSelecionado]);
 
   const handleSelectChange = (idAluno) => {
     const aluno = alunos.find(a => a.idAluno === parseInt(idAluno, 10));
     setAlunoSelecionado(aluno);
+    setDisciplinas([]); // Limpa as disciplinas ao selecionar um novo aluno
   };
 
-  const handleDesmatricular = () => {
-    if (!alunoSelecionado) return;
-
-    axios.delete(`http://localhost:8080/api/delete_aluno/${alunoSelecionado.idAluno}`)
-      .then(() => {
-        setNotification({ message: 'Aluno desmatriculado com sucesso!', color: 'green' });
-        setAlunos(alunos.filter(aluno => aluno.idAluno !== alunoSelecionado.idAluno));
-        setAlunoSelecionado(null);
-      })
-      .catch((error) => {
-        console.error('Erro ao desmatricular o aluno:', error);
-        setNotification({ message: 'Erro ao desmatricular o aluno. Tente novamente.', color: 'red' });
-      });
+  const handleDesmatricular = (idDisciplinas) => {
+    axios.delete(`http://localhost:8080/api/delete_disciplina_aluno`, {
+      data: {
+        idAluno: alunoSelecionado.idAluno,
+        idDisciplinas: idDisciplinas
+      }
+    })
+    .then(() => {
+      setNotification({ message: 'Disciplina desmatriculada com sucesso!', color: 'green' });
+      setDisciplinas(disciplinas.filter(disciplina => disciplina.idDisciplinas !== idDisciplinas));
+    })
+    .catch((error) => {
+      console.error('Erro ao desmatricular a disciplina:', error);
+      setNotification({ message: 'Erro ao desmatricular a disciplina. Tente novamente.', color: 'red' });
+    });
   };
 
   return (
@@ -65,35 +82,54 @@ const PerfilAluno = () => {
             />
 
             {alunoSelecionado && (
-              <Table striped highlightOnHover mt="md">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Matrícula</th>
-                    <th>ID do Usuário</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{alunoSelecionado.idAluno}</td>
-                    <td>{alunoSelecionado.nome}</td>
-                    <td>{alunoSelecionado.matricula}</td>
-                    <td>{alunoSelecionado.Usuario_idUsuario}</td>
-                  </tr>
-                </tbody>
-              </Table>
+              <>
+                <Table striped highlightOnHover mt="md">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Matrícula</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{alunoSelecionado.nome}</td>
+                      <td>{alunoSelecionado.matricula}</td>
+                    </tr>
+                  </tbody>
+                </Table>
+                <Button color="red" onClick={() => handleDesmatricular(disciplina.idDisciplinas)}>
+                              Desmatricular
+                            </Button>
+                <Title order={4} mt="md">Disciplinas Matriculadas</Title>
+                <Table striped highlightOnHover mt="md">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Aberto para Matrícula</th>
+                      <th>Número de Créditos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {disciplinas.length > 0 ? (
+                      disciplinas.map((disciplina) => (
+                        <tr key={disciplina.idDisciplinas}>
+                          <td>{disciplina.nome}</td>
+                          <td>{disciplina.abertoMatricula ? 'Sim' : 'Não'}</td>
+                          <td>{disciplina.numCreditos}</td>
+                          <td>
+                            
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: 'center' }}>Nenhuma disciplina matriculada</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </>
             )}
-
-            <Group position="center" mt="md">
-              <Button
-                color="red"
-                onClick={handleDesmatricular}
-                disabled={!alunoSelecionado}
-              >
-                Desmatricular Aluno
-              </Button>
-            </Group>
           </>
         )}
 

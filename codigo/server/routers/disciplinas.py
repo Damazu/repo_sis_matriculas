@@ -174,3 +174,4 @@ def update_disciplina(idDisciplinas):
             cursor.close()
         if conn:
             conn.close()
+
