@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AppShell } from '@mantine/core';
-import Header from '../Header/Header';
+import Header from '../header/header';
 import Navbar from '../navbar/navbar';
 
 const Layout = ({ children }) => {
