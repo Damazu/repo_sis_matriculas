@@ -1,7 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Container, Loader, Table, Box, Notification, Title, Button, Group, Modal,Select } from '@mantine/core';
+import { Container, Loader, Table, Box, Notification, Title, Button, Group, Modal, Select } from '@mantine/core';
 import axios from 'axios';
+import "./PerfilAluno.css"
 
 const PerfilAluno = () => {
   const [alunos, setAlunos] = useState([]);
@@ -56,16 +57,6 @@ const PerfilAluno = () => {
           setNotification({ message: 'Erro ao carregar curso ou disciplinas do aluno.', color: 'red' });
           setLoading(false);
         });
-
-      // Busca todas as disciplinas disponíveis
-      axios.get('http://localhost:8080/api/get_disciplinas')
-        .then((response) => {
-          setTodasDisciplinas(response.data.disciplinas);
-        })
-        .catch((error) => {
-          console.error('Erro ao buscar todas as disciplinas:', error);
-          setNotification({ message: 'Erro ao carregar todas as disciplinas.', color: 'red' });
-        });
     }
   }, [alunoSelecionado]);
 
@@ -93,7 +84,7 @@ const PerfilAluno = () => {
     });
   };
 
-  const handleDesvincular = (idDisciplinas) => {
+  const handleDesmatricular = (idDisciplinas) => {
     axios.delete(`http://localhost:8080/api/delete_disciplina_aluno`, {
       data: {
         idAluno: alunoSelecionado.idAluno,
@@ -101,47 +92,12 @@ const PerfilAluno = () => {
       }
     })
     .then(() => {
-      setNotification({ message: 'Disciplina desvinculada com sucesso!', color: 'green' });
+      setNotification({ message: 'Disciplina desmatriculada com sucesso!', color: 'green' });
       setDisciplinas(disciplinas.filter(disciplina => disciplina.idDisciplinas !== idDisciplinas));
     })
     .catch((error) => {
-      console.error('Erro ao desvincular a disciplina:', error);
-      setNotification({ message: 'Erro ao desvincular a disciplina. Tente novamente.', color: 'red' });
-    });
-  };
-
-  const handleDeletarAluno = () => {
-    if (!alunoSelecionado) return;
-
-    axios.delete(`http://localhost:8080/api/delete_aluno/${alunoSelecionado.idAluno}`)
-      .then(() => {
-        setNotification({ message: 'Aluno deletado com sucesso!', color: 'green' });
-        setAlunos(alunos.filter(aluno => aluno.idAluno !== alunoSelecionado.idAluno));
-        setAlunoSelecionado(null);
-        setDisciplinas([]);
-      })
-      .catch((error) => {
-        console.error('Erro ao deletar o aluno:', error);
-        setNotification({ message: 'Erro ao deletar o aluno. Tente novamente.', color: 'red' });
-      });
-  };
-
-  const handleAdicionarDisciplina = () => {
-    if (!disciplinaSelecionada) return;
-
-    axios.post(`http://localhost:8080/api/matricular_aluno`, {
-      idAluno: alunoSelecionado.idAluno,
-      disciplinas: [disciplinaSelecionada]
-    })
-    .then(() => {
-      setNotification({ message: 'Disciplina adicionada com sucesso!', color: 'green' });
-      setDisciplinas([...disciplinas, todasDisciplinas.find(d => d.idDisciplinas === parseInt(disciplinaSelecionada))]);
-      setOpened(false);
-      setDisciplinaSelecionada(null);
-    })
-    .catch((error) => {
-      console.error('Erro ao adicionar a disciplina:', error);
-      setNotification({ message: 'Erro ao adicionar a disciplina. Tente novamente.', color: 'red' });
+      console.error('Erro ao desmatricular a disciplina:', error);
+      setNotification({ message: 'Erro ao desmatricular a disciplina. Tente novamente.', color: 'red' });
     });
   };
 
@@ -171,18 +127,14 @@ const PerfilAluno = () => {
                 <Table striped highlightOnHover mt="md">
                   <thead>
                     <tr>
-                      <th>ID</th>
                       <th>Nome</th>
                       <th>Matrícula</th>
-                      <th>ID do Usuário</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>{alunoSelecionado.idAluno}</td>
                       <td>{alunoSelecionado.nome}</td>
                       <td>{alunoSelecionado.matricula}</td>
-                      <td>{alunoSelecionado.Usuario_idUsuario}</td>
                     </tr>
                   </tbody>
                 </Table>
@@ -281,31 +233,8 @@ const PerfilAluno = () => {
           </Notification>
         )}
       </Box>
-
-      <Modal
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Adicionar Nova Disciplina"
-      >
-        <Select
-          label="Selecione uma disciplina"
-          placeholder="Escolha uma disciplina"
-          data={todasDisciplinas.map((disciplina) => ({
-            value: disciplina.idDisciplinas.toString(),
-            label: disciplina.nome
-          }))}
-          onChange={setDisciplinaSelecionada}
-        />
-
-        <Group position="right" mt="md">
-          <Button color="green" onClick={handleAdicionarDisciplina}>
-            Adicionar
-          </Button>
-        </Group>
-      </Modal>
     </Container>
   );
 };
 
 export default PerfilAluno;
-

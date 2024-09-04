@@ -219,104 +219,7 @@ def get_disciplinas_aluno(idAluno):
         if conn:
             conn.close()
 
-# Função para alocar aluno a um curso
-@aluno_bp.route('/alocar_aluno_curso', methods=['POST'])
-def alocar_aluno_curso():
-    conn = None
-    cursor = None
-    try:
-        data = request.json
-        aluno_id = data.get('Aluno_idAluno')
-        curso_id = data.get('Curso_idCurso')
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        insert_query = "INSERT INTO Curso_has_Aluno (Curso_idCurso, Aluno_idAluno) VALUES (%s, %s)"
-        cursor.execute(insert_query, (curso_id, aluno_id))
-
-        conn.commit()
-
-        return jsonify({'message': 'Aluno alocado ao curso com sucesso!'}), 201
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        return jsonify({'error': str(e)}), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-@aluno_bp.route('/get_curso_aluno/<int:idAluno>', methods=['GET'])
-def get_curso_aluno(idAluno):
-    conn = None
-    cursor = None
-    print(idAluno)
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT Curso_idCurso FROM Curso_has_Aluno WHERE Aluno_idAluno = %s", (idAluno,))
-        curso_id = cursor.fetchone()
-
-        if not curso_id:
-            return jsonify({'error': 'Curso não encontrado para o aluno.'}), 404
-
-        cursor.execute("SELECT idCurso, nomeCurso FROM Curso WHERE idCurso = %s", (curso_id,))
-        curso = cursor.fetchone()
-
-        if not curso:
-            return jsonify({'error': 'Curso não encontrado.'}), 404
-
-        return jsonify({'curso': {'idCurso': curso[0], 'nomeCurso': curso[1]}}), 200
-
-    except Exception as e:
-        print(f"Erro ao buscar curso para o aluno {idAluno}: {e}")
-        return jsonify({'error': str(e)}), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-@aluno_bp.route('/delete_disciplina_aluno', methods=['DELETE'])
-def delete_disciplina_aluno():
-    conn = None
-    cursor = None
-    try:
-        data = request.json
-        id_aluno = data.get('idAluno')
-        id_disciplina = data.get('idDisciplinas')
-
-        if not id_aluno or not id_disciplina:
-            return jsonify({'error': 'Parâmetros idAluno e idDisciplinas são obrigatórios.'}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Remover a disciplina do aluno
-        delete_query = """
-            DELETE FROM Aluno_has_Disciplinas
-            WHERE Aluno_idAluno = %s AND Disciplinas_idDisciplinas = %s
-        """
-        cursor.execute(delete_query, (id_aluno, id_disciplina))
-        conn.commit()
-
-        return jsonify({'message': 'Disciplina desmatriculada com sucesso!'}), 200
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        return jsonify({'error': str(e)}), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 # Função para alocar aluno a um curso
 @aluno_bp.route('/alocar_aluno_curso', methods=['POST'])
@@ -381,41 +284,7 @@ def get_curso_aluno(idAluno):
         if conn:
             conn.close()
 
-@aluno_bp.route('/delete_disciplina_aluno', methods=['DELETE'])
-def delete_disciplina_aluno():
-    conn = None
-    cursor = None
-    try:
-        data = request.json
-        id_aluno = data.get('idAluno')
-        id_disciplina = data.get('idDisciplinas')
 
-        if not id_aluno or not id_disciplina:
-            return jsonify({'error': 'Parâmetros idAluno e idDisciplinas são obrigatórios.'}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Remover a disciplina do aluno
-        delete_query = """
-            DELETE FROM Aluno_has_Disciplinas
-            WHERE Aluno_idAluno = %s AND Disciplinas_idDisciplinas = %s
-        """
-        cursor.execute(delete_query, (id_aluno, id_disciplina))
-        conn.commit()
-
-        return jsonify({'message': 'Disciplina desmatriculada com sucesso!'}), 200
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        return jsonify({'error': str(e)}), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 @aluno_bp.route('/delete_disciplina_aluno', methods=['DELETE'])
 def delete_disciplina_aluno():
