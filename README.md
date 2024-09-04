@@ -1,16 +1,6 @@
 # Histórias de Usuário
 
-## História 1: Gerenciamento de Currículo
-**Como** secretária da universidade,  
-**Eu quero** poder gerar e manter o currículo para cada semestre,  
-**Para que** as informações sobre as disciplinas, professores e alunos estejam sempre atualizadas e corretas.
-
-### Critérios de Aceitação:
-- A secretária deve ser capaz de adicionar, editar e remover disciplinas.
-- O currículo deve ser gerado automaticamente para cada semestre com base nas disciplinas oferecidas.
-- O sistema deve permitir a associação de professores a disciplinas e a alocação de alunos nas disciplinas.
-
-## História 2: Matrícula em Disciplinas
+## História 1: Matrícula em Disciplinas
 **Como** aluno,  
 **Eu quero** me matricular em até 4 disciplinas obrigatórias e 2 disciplinas optativas,  
 **Para que** eu possa completar os créditos necessários para o meu curso.
@@ -21,7 +11,7 @@
 - O aluno deve ser capaz de escolher até 2 disciplinas optativas como alternativas.
 - O sistema deve verificar se há vagas disponíveis antes de confirmar a matrícula.
 
-## História 3: Cancelamento de Matrícula
+## História 2: Cancelamento de Matrícula
 **Como** aluno,  
 **Eu quero** poder cancelar minha matrícula em uma disciplina,  
 **Para que** eu possa ajustar meu horário ou corrigir uma escolha incorreta.
@@ -31,7 +21,7 @@
 - O sistema deve permitir a visualização das disciplinas nas quais o aluno está matriculado.
 - O sistema deve atualizar automaticamente as vagas disponíveis após o cancelamento.
 
-## História 4: Validação e Encerramento de Disciplinas
+## História 3: Validação e Encerramento de Disciplinas
 **Como** administrador do sistema,  
 **Eu quero** que as disciplinas com menos de 3 alunos matriculados sejam automaticamente canceladas,  
 **Para que** apenas disciplinas com demanda mínima sejam oferecidas no semestre.
@@ -41,7 +31,7 @@
 - Disciplinas com menos de 3 alunos devem ser automaticamente canceladas.
 - Disciplinas com 60 alunos matriculados devem ser encerradas para novas inscrições.
 
-## História 5: Notificação ao Sistema de Cobranças
+## História 4: Notificação ao Sistema de Cobranças
 **Como** administrador do sistema,  
 **Eu quero** que o sistema de matrículas notifique automaticamente o sistema de cobranças após a inscrição de um aluno,  
 **Para que** o aluno seja corretamente cobrado pelas disciplinas em que está matriculado.
@@ -50,7 +40,7 @@
 - Após a conclusão da matrícula, o sistema deve enviar uma notificação ao sistema de cobranças com os dados do aluno e as disciplinas em que ele se inscreveu.
 - A notificação deve incluir o valor total a ser cobrado, baseado nos créditos das disciplinas.
 
-## História 6: Acesso ao Sistema de Matrículas
+## História 5: Acesso ao Sistema de Matrículas
 **Como** aluno,  
 **Eu quero** acessar o sistema de matrículas durante os períodos de matrícula definidos,  
 **Para que** eu possa realizar minhas inscrições ou cancelamentos conforme necessário.
