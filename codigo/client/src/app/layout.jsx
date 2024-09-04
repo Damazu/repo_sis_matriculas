@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Layout from "@/components/applayout/layout";
+import Layout from "@/components/applayout/layout.jsx";
 import { MantineProvider } from "@mantine/core";
 
 const inter = Inter({ subsets: ["latin"] });
