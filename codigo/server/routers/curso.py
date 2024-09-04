@@ -6,6 +6,7 @@ from psycopg2.errors import UniqueViolation
 # Cria um Blueprint para a rota de Curso
 curso_bp = Blueprint('curso', __name__)
 
+# Função para adicionar curso
 @curso_bp.route('/add_curso', methods=['POST'])
 def add_curso():
     conn = None
@@ -20,13 +21,8 @@ def add_curso():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        insert_query = """
-            INSERT INTO Curso (nomeCurso, numCreditos)
-            VALUES (%s, %s)
-        """
+        insert_query = "INSERT INTO Curso (nomeCurso, numCreditos) VALUES (%s, %s)"
         cursor.execute(insert_query, (nome_curso, num_creditos))
-
         conn.commit()
 
         return jsonify({'message': 'Curso inserido com sucesso!'}), 201
@@ -47,6 +43,7 @@ def add_curso():
         if conn:
             conn.close()
 
+# Função para listar todos os cursos
 @curso_bp.route('/get_cursos', methods=['GET'])
 def get_cursos():
     conn = None
@@ -54,18 +51,10 @@ def get_cursos():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
         cursor.execute("SELECT idCurso, nomeCurso, numCreditos FROM Curso")
         cursos = cursor.fetchall()
 
-        resultado = []
-        for curso in cursos:
-            resultado.append({
-                'idCurso': curso[0],
-                'nomeCurso': curso[1],
-                'numCreditos': curso[2]
-            })
-
+        resultado = [{'idCurso': curso[0], 'nomeCurso': curso[1], 'numCreditos': curso[2]} for curso in cursos]
         return jsonify({'cursos': resultado}), 200
 
     except Exception as e:
@@ -77,7 +66,7 @@ def get_cursos():
         if conn:
             conn.close()
 
-# Rota para deletar um curso por ID
+# Função para deletar um curso
 @curso_bp.route('/delete_curso/<int:idCurso>', methods=['DELETE'])
 def delete_curso(idCurso):
     conn = None
@@ -85,7 +74,6 @@ def delete_curso(idCurso):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
         cursor.execute("SELECT idCurso FROM Curso WHERE idCurso = %s", (idCurso,))
         curso = cursor.fetchone()
 
@@ -109,7 +97,7 @@ def delete_curso(idCurso):
         if conn:
             conn.close()
 
-# Rota para atualizar um curso por ID
+# Função para atualizar um curso
 @curso_bp.route('/update_curso/<int:idCurso>', methods=['PUT'])
 def update_curso(idCurso):
     conn = None
@@ -124,18 +112,13 @@ def update_curso(idCurso):
 
         conn = get_db_connection()
         cursor = conn.cursor()
-
         cursor.execute("SELECT idCurso FROM Curso WHERE idCurso = %s", (idCurso,))
         curso = cursor.fetchone()
 
         if curso is None:
             return jsonify({'error': 'Curso não encontrado.'}), 404
 
-        update_query = """
-            UPDATE Curso
-            SET nomeCurso = %s, numCreditos = %s
-            WHERE idCurso = %s
-        """
+        update_query = "UPDATE Curso SET nomeCurso = %s, numCreditos = %s WHERE idCurso = %s"
         cursor.execute(update_query, (nome_curso, num_creditos, idCurso))
         conn.commit()
 
@@ -152,6 +135,7 @@ def update_curso(idCurso):
         if conn:
             conn.close()
 
+# Função para obter disciplinas por curso
 @curso_bp.route('/get_disciplinas_by_curso/<int:idCurso>', methods=['GET'])
 def get_disciplinas_by_curso(idCurso):
     conn = None
@@ -160,11 +144,19 @@ def get_disciplinas_by_curso(idCurso):
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Verifica se o curso existe
+        cursor.execute("SELECT idCurso FROM Curso WHERE idCurso = %s", (idCurso,))
+        curso = cursor.fetchone()
+
+        if curso is None:
+            return jsonify({'error': 'Curso não encontrado.'}), 404
+
+        # Busca as disciplinas associadas ao curso
         query = """
             SELECT d.idDisciplinas, d.nome, d.abertoMatricula, d.numCreditos
-            FROM curso_has_disciplinas chd
-            JOIN Disciplinas d ON chd.disciplinas_iddisciplinas = d.idDisciplinas
-            WHERE chd.curso_idcurso = %s
+            FROM Curso_has_Disciplinas chd
+            JOIN Disciplinas d ON chd.Disciplinas_idDisciplinas = d.idDisciplinas
+            WHERE chd.Curso_idCurso = %s
         """
         cursor.execute(query, (idCurso,))
         disciplinas = cursor.fetchall()
@@ -190,7 +182,7 @@ def get_disciplinas_by_curso(idCurso):
         if conn:
             conn.close()
 
-# Rota para associar uma disciplina a um curso
+# Função para associar uma disciplina a um curso
 @curso_bp.route('/add_disciplina_to_curso', methods=['POST'])
 def add_disciplina_to_curso():
     conn = None
@@ -205,13 +197,8 @@ def add_disciplina_to_curso():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        insert_query = """
-            INSERT INTO curso_has_disciplinas (curso_idcurso, disciplinas_iddisciplinas)
-            VALUES (%s, %s)
-        """
+        insert_query = "INSERT INTO curso_has_disciplinas (curso_idcurso, disciplinas_iddisciplinas) VALUES (%s, %s)"
         cursor.execute(insert_query, (id_curso, id_disciplina))
-
         conn.commit()
 
         return jsonify({'message': 'Disciplina associada ao curso com sucesso!'}), 201
@@ -231,3 +218,4 @@ def add_disciplina_to_curso():
             cursor.close()
         if conn:
             conn.close()
+

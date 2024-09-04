@@ -1,15 +1,17 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Group, Box, TextInput, Notification, Radio } from '@mantine/core';
+import { Container, Button, Group, Box, TextInput, Notification, Radio, Select } from '@mantine/core';
 import axios from 'axios';
 
 const Cadastro = () => {
   const [tipoUsuario, setTipoUsuario] = useState('aluno');
   const [nome, setNome] = useState('');
   const [matricula, setMatricula] = useState('');
-  const [login, setLogin] = useState(''); // Novo estado para login
-  const [senha, setSenha] = useState(''); // Novo estado para senha
+  const [login, setLogin] = useState('');
+  const [senha, setSenha] = useState('');
   const [notification, setNotification] = useState({ message: '', color: '' });
+  const [cursos, setCursos] = useState([]);  // Novo estado para cursos
+  const [cursoSelecionado, setCursoSelecionado] = useState(''); // Novo estado para o curso selecionado
 
   // Função para gerar matrícula aleatória de 8 dígitos
   const gerarMatriculaAleatoria = () => {
@@ -24,41 +26,68 @@ const Cadastro = () => {
     }
   }, [tipoUsuario]);
 
+  useEffect(() => {
+    if (tipoUsuario === 'aluno') {
+      // Busca os cursos disponíveis ao selecionar 'Aluno'
+      axios.get('http://localhost:8080/api/get_cursos')
+        .then((response) => {
+          setCursos(response.data.cursos);
+        })
+        .catch((error) => {
+          console.error('Erro ao buscar cursos:', error);
+          setNotification({ message: 'Erro ao carregar cursos.', color: 'red' });
+        });
+    } else {
+      setCursos([]); // Limpa os cursos se for professor
+      setCursoSelecionado(''); // Limpa a seleção de curso se for professor
+    }
+  }, [tipoUsuario]);
+
   const handleCadastro = async () => {
     try {
       // 1. Cadastrar o usuário geral
       const novoUsuarioResponse = await axios.post('http://localhost:8080/api/add_usuario', { login, senha });
-      const usuarioId = novoUsuarioResponse.data.idUsuario; 
-   
+      const usuarioId = novoUsuarioResponse.data.idUsuario;
+  
       let dadosCadastro = {
         nome,
-        Usuario_idUsuario: usuarioId  // Use o usuarioId diretamente aqui
+        Usuario_idUsuario: usuarioId
       };
-   
+  
       if (tipoUsuario === 'aluno') {
         dadosCadastro.matricula = matricula;
-        await axios.post('http://localhost:8080/api/add_aluno', dadosCadastro);
-        setNotification({ message: 'Aluno cadastrado com sucesso!', color: 'green' });
+        const novoAlunoResponse = await axios.post('http://localhost:8080/api/add_aluno', dadosCadastro);
+        const alunoId = novoAlunoResponse.data.idAluno; // Captura o idAluno retornado
+  
+        // 2. Associar o aluno ao curso selecionado
+        await axios.post('http://localhost:8080/api/alocar_aluno_curso', {
+          Aluno_idAluno: alunoId, // Usa o idAluno capturado aqui
+          Curso_idCurso: cursoSelecionado
+        });
+  
+        setNotification({ message: 'Aluno cadastrado e alocado ao curso com sucesso!', color: 'green' });
       } else if (tipoUsuario === 'professor') {
         await axios.post('http://localhost:8080/api/add_professor', dadosCadastro);
         setNotification({ message: 'Professor cadastrado com sucesso!', color: 'green' });
       }
-
+  
       // Limpar os campos após o cadastro bem-sucedido
       setNome('');
-      setMatricula(tipoUsuario === 'aluno' ? gerarMatriculaAleatoria() : ''); // Gera uma nova matrícula para o próximo cadastro de aluno
+      setMatricula(tipoUsuario === 'aluno' ? gerarMatriculaAleatoria() : '');
       setLogin('');
       setSenha('');
-
+      setCursoSelecionado(''); // Limpa a seleção de curso
+  
     } catch (error) {
       console.error('Erro ao cadastrar:', error);
       let mensagemErro = 'Erro ao cadastrar. Verifique os dados.';
       if (error.response && error.response.data && error.response.data.error) {
-        mensagemErro = error.response.data.error; 
+        mensagemErro = error.response.data.error;
       }
       setNotification({ message: mensagemErro, color: 'red' });
     }
   };
+  
 
   return (
     <Container style={{ marginTop: '30px', maxWidth: '400px' }}>
@@ -91,7 +120,19 @@ const Cadastro = () => {
           mb="sm"
         />
 
-        
+        {tipoUsuario === 'aluno' && (
+          <Select
+            label="Curso"
+            placeholder="Selecione um curso"
+            data={cursos.map((curso) => ({
+              value: curso.idCurso.toString(),
+              label: curso.nomeCurso
+            }))}
+            value={cursoSelecionado}
+            onChange={setCursoSelecionado}
+            mb="sm"
+          />
+        )}
 
         <TextInput 
           label="Senha"
