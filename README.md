@@ -62,4 +62,3 @@
 
 ## Diagrama de Entidades de Relacionamento
 
-![DER.jpeg](Artefatos/DERMatriculas.jpeg)
