@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Container, Loader, Table, Box, Notification, Title, Select, Button, Group } from '@mantine/core';
+import { Container, Loader, Table, Box, Notification, Title, Button, Group, Modal,Select } from '@mantine/core';
 import axios from 'axios';
 import "./PerfilAluno.css"
 
@@ -12,6 +12,8 @@ const PerfilAluno = () => {
   const [curso, setCurso] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ message: '', color: '' });
+
+  const [modalOpened, setModalOpened] = useState(false); // Controle do modal
 
   useEffect(() => {
     // Busca os dados dos alunos
@@ -74,6 +76,7 @@ const PerfilAluno = () => {
       setNotification({ message: 'Disciplina vinculada com sucesso!', color: 'green' });
       // Atualiza as disciplinas já matriculadas
       setDisciplinas([...disciplinas, todasDisciplinas.find(d => d.idDisciplinas === idDisciplinas)]);
+      setModalOpened(false); // Fecha o modal após a vinculação
     })
     .catch((error) => {
       console.error('Erro ao vincular disciplina:', error);
@@ -82,7 +85,7 @@ const PerfilAluno = () => {
   };
 
   const handleDesmatricular = (idDisciplinas) => {
-    axios.delete('http://localhost:8080/api/delete_disciplina_aluno', {
+    axios.delete(`http://localhost:8080/api/delete_disciplina_aluno`, {
       data: {
         idAluno: alunoSelecionado.idAluno,
         idDisciplinas: idDisciplinas
@@ -107,6 +110,7 @@ const PerfilAluno = () => {
           <Loader size="lg" />
         ) : (
           <>
+            {/* Select para selecionar o aluno */}
             <Select
               label="Selecione um aluno"
               placeholder="Escolha um aluno"
@@ -119,6 +123,7 @@ const PerfilAluno = () => {
 
             {alunoSelecionado && (
               <>
+                {/* Exibe os detalhes do aluno */}
                 <Table striped highlightOnHover mt="md">
                   <thead>
                     <tr>
@@ -138,22 +143,46 @@ const PerfilAluno = () => {
                   <>
                     <Title order={4} mt="md">Curso: {curso.nomeCurso}</Title>
                     
-                    {/* Botão para Vincular Nova Disciplina */}
-                    <Title order={4} mt="md">Vincular Nova Disciplina</Title>
-                    <Select
-                      label="Disciplinas Disponíveis"
-                      placeholder="Escolha uma disciplina para vincular"
-                      data={todasDisciplinas
-                        .filter(d => !disciplinas.find(m => m.idDisciplinas === d.idDisciplinas))
-                        .map((disciplina) => ({
-                          value: disciplina.idDisciplinas.toString(),
-                          label: disciplina.nome
-                        }))}
-                      onChange={(idDisciplinas) => handleVincularDisciplina(parseInt(idDisciplinas))}
-                      mb="sm"
-                    />
+                    {/* Botão para abrir o modal de vinculação de disciplinas */}
+                    <Group position="right" mt="md">
+                      <Button color="green" onClick={() => setModalOpened(true)}>
+                        Adicionar Disciplina
+                      </Button>
+                    </Group>
 
-                    {/* Disciplinas já matriculadas */}
+                    {/* Modal com a lista de disciplinas */}
+                    <Modal
+                      opened={modalOpened}
+                      onClose={() => setModalOpened(false)}
+                      title="Vincular Nova Disciplina"
+                    >
+                      <Table striped highlightOnHover mt="md">
+                        <thead>
+                          <tr>
+                            <th>Nome da Disciplina</th>
+                            <th>Créditos</th>
+                            <th>Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {todasDisciplinas
+                            .filter(d => !disciplinas.find(m => m.idDisciplinas === d.idDisciplinas))
+                            .map((disciplina) => (
+                              <tr key={disciplina.idDisciplinas}>
+                                <td>{disciplina.nome}</td>
+                                <td>{disciplina.numCreditos}</td>
+                                <td>
+                                  <Button onClick={() => handleVincularDisciplina(disciplina.idDisciplinas)}>
+                                    Vincular
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </Table>
+                    </Modal>
+
+                    {/* Exibe as disciplinas já matriculadas */}
                     <Title order={4} mt="md">Disciplinas Matriculadas</Title>
                     <Table striped highlightOnHover mt="md">
                       <thead>
@@ -209,3 +238,4 @@ const PerfilAluno = () => {
 };
 
 export default PerfilAluno;
+
